@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生成零宽字符（幽灵字符）</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            height: 100vw;
+            width: 100vw;
+            background: linear-gradient(rgba(0, 0, 0), rgba(0, 0, 205));
+        }
+
+        .inputArea {
+            width: 100%;
+            height: 400px;
+        }
+
+        .tip {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 200px;
+            font-size: 2em;
+            font-weight: 900;
+            color: aliceblue;
+            animation: shine linear 2s reverse infinite;
+        }
+
+        @keyframes shine {
+            0% {
+                color: rgb(255, 246, 143);
+            }
+
+            50% {
+                color: rgb(255, 255, 0);
+                text-shadow:
+                    10px 10px 10px rgba(255, 255, 0, 0.5),
+            }
+
+            100% {
+                color: rgb(255, 246, 143);
+            }
+        }
+
+        .content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        #inputText {
+            border: white solid 5px;
+            background-color: grey;
+            width: 500px;
+            height: 100px;
+            color: rgba(255, 255, 0);
+            font-size: 1.5em;
+        }
+
+        .startArea {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .start{
+            width: 100px;
+            height: 50px;
+            background-color: rgb(255, 215,0);
+            border: rgb(238, 201, 0) solid 10px;
+            font-weight: 900;
+        }
+
+        .showBox{
+            width: 100%;
+            height: 300px;
+            color: rgba(255, 255, 0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            font-weight: 900;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="inputArea">
+        <div class="tip">
+            请输入加密内容
+        </div>
+        <div class="content" id="content">
+            <input type="text" id="inputText">
+        </div>
+    </div>
+
+    <div class="startArea">
+        <button class="start" id="start" onclick="start()">生成零宽字符</button>
+    </div>
+    <div class="showBox" id="showBox">
+
+    </div>
+</body>
+<script>
+    const splitChar = '\ufeff';//分隔符
+    const zeroChars = ['\u200b', '\u200c', '\u200d', '\u200e', '\u200f'];//分别代表1，2，3，4，5
+
+    //加密一个字符
+    function wordKey(text) {
+
+        const code = text.charCodeAt(0);//获取文本的Unicode编码
+        const code5 = code.toString(5);//将编码转换为5进制
+
+        let res = splitChar;//分隔符先加到字符串中
+        for (let c of code5) {
+            const index = parseInt(c);//将code5[c]由字符串型转为int型，当作下标
+            res += zeroChars[index];//将对应下标的零宽字符加到加密字符串中
+
+        }
+        res += splitChar;
+        return res;
+    }
+
+    // 调用加密字符的函数，加密整个字符串
+    function textKey() {
+        const text = document.getElementById("inputText").value;
+        let str = '';
+        for (let i = 0; i < text.length; i++) {
+            str += wordKey(text[i]);
+        }
+        return str;
+    }
+
+    // 将输入的文本转变成零宽字符进行加密
+    function start() {
+        const res = textKey();
+        const str = `你${res}好`;
+        console.log('加密结果：', str);
+        document.getElementById("showBox").textContent = `你${res}好`;
+    }
+
+</script>
+
+</html>

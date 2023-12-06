@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>解码</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            height: 100vw;
+            width: 100vw;
+            background: linear-gradient(rgba(0, 0, 0), rgba(0, 0, 205));
+        }
+
+        .inputArea {
+            width: 100%;
+            height: 400px;
+        }
+
+        .tip {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 200px;
+            font-size: 2em;
+            font-weight: 900;
+            color: aliceblue;
+            animation: shine linear 2s reverse infinite;
+        }
+
+        @keyframes shine {
+            0% {
+                color: rgb(255, 246, 143);
+            }
+
+            50% {
+                color: rgb(255, 255, 0);
+                text-shadow:
+                    10px 10px 10px rgba(255, 255, 0, 0.5),
+            }
+            100%{
+                color: rgb(255, 246, 143);
+            }
+        }
+
+        .textArea {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        #text {
+            border: white solid 5px;
+            background-color: grey;
+            width: 500px;
+            height: 100px;
+            color: rgba(255, 255, 0);
+            font-size: 1.5em;
+        }
+
+        .buttonArea{
+            width: 100%;
+            
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #go{
+            width: 100px;
+            height: 50px;
+            background-color: rgb(255, 215,0);
+            border: rgb(238, 201, 0) solid 10px;
+            font-weight: 900;
+        }
+
+        .showBox{
+            width: 100%;
+            height: 300px;
+            color: rgba(255, 255, 0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            font-weight: 900;
+        }
+
+
+    </style>
+</head>
+
+<body>
+    <div class="inputArea">
+        <div class="tip">
+            请将复制的需要解密的幽灵字符粘贴到输入框
+        </div>
+        <div class="textArea">
+            <input type="text" id="text">
+        </div>
+
+    </div>
+    <div class="buttonArea">
+        <button id="go" onclick="go()">解析</button>
+    </div>
+    <div class="showBox" id="showBox">
+
+    </div>
+</body>
+<script>
+    const splitChar = '\ufeff';//分隔符
+    const zeroChars = ['\u200b', '\u200c', '\u200d', '\u200e', '\u200f'];//分别代表1，2，3，4，5
+
+    //解密单个字符
+    function decodeChar(str) {
+        const charArr = str.split('');//将字符串转化为字符型数组
+        let code5 = '';
+        for (let i = 0; i < charArr.length; i++) {
+            const zeroChar = charArr[i];
+            const index = zeroChars.indexOf(zeroChar);//从zeroChars中找到zerochar的下标--5进制的编码数字
+            code5 += index;//连在一起就是整个5进制编码
+        }
+        const code = parseInt(code5, 5);//将以5进制为基数的字符串转化为int类型（10进制也就是正常的字符编码）
+        const word = String.fromCharCode(code);//将Unicode编码转换回字符
+        return word;
+    }
+
+    //解密字符串
+    function decodeArray(text) {
+        const arr = text.split(splitChar);//将传入的字符串按照splitChar分成字符串型数组
+        let res = '';
+        for (let item of arr) {
+            if (zeroChars.includes(item[0])) {
+                res += decodeChar(item);
+            }
+        }
+        return res;
+    }
+    function go() {
+        const text = document.getElementById("text").value;
+        document.getElementById("showBox").textContent = decodeArray(text);
+    }
+
+</script>
+
+</html>
